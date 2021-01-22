@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emitir video a visualizar</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <!--Este archivo se va aencargar de emitir-->
+    <h1>Emision en directo</h1>
+    <button id="btn">Emitir</button>
+    <video src="" id="video" style="width: 800px; height: 600px;" autoplay="true"></video>
+    <canvas id="preview"></canvas>
+    <div class="status"></div>
+
+
+    <script>
+        var canvas=document.querySelector('#preview');//optenemos el canvas del html
+        var context=canvas.getContext('2d');//obtenemos un contexto del camvas en 2d
+        var btn=document.querySelector('#btn');
+        canvas.style.display='none';//en el emisor ocultamos el canvas ya qeu sera el receptor el que vea el canvas
+        //establecemops el tamaño del canvas
+        canvas.width=512;
+        canvas.height=384;
+        //establecemso el tamaño del context        
+        context.width=canvas.width;
+        context.height=canvas.height;
+        
+        var video =document.querySelector('#video');//recojemos el selector del video
+
+        var socket = io();//socket matniene la funcion de io
+
+        function publicarMensaje(msg){
+            document.querySelector('.status').innerText = msg;//seleccionamso el div de estatus y le colocamos el mesjae que nso llega a la funcion
+        }
+
+        //funcion para cargara la camara de la computadora
+        function loadCamara(stream){
+            video.srcObject=stream;//el objeto de la camara sera el parametro que recive la funcion
+            publicarMensaje('camara Funcionando');
+        }
+
+        function errorCamara(){
+            publicarMensaje('Camara ha fallado');
+        }
+
+        function verVideo(video, context){
+            context.drawImage(video, 0,0,context.width, context.height);//copiamos como imagen loq ue esta emitiendo la camara de video
+            socket.emit('stream', canvas.toDataURL('image/webp'));//emitimos la imagen del video ala socket bajo el evento de stream
+        }
+
+        btn.addEventListener('click', ()=>{//pedimos permiso a la camara de estos posbles navegadores y guardamos el permiso en la variable  navigator.getUserMedia
+            navigator.getUserMedia=(navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msgGetUserMedia)
+            if(navigator.getUserMedia){//si no esta esta vacia la variable
+                //pedicmos acceso de video
+                navigator.getUserMedia({video:true}, loadCamara, errorCamara)
+            }
+
+            //creamos un intervalo de tiempo en el que se mostrara el la imgane del video en el canvas
+            var intervalo=setInterval(()=>{
+                verVideo(video,context);
+            }, 30)//sera de 30milisegundos
+
+        })
+    </script>
+</body>
+</html>

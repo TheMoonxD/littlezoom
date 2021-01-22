@@ -1,0 +1,2 @@
+# Pequeña aplicacion zoom
+## Para correr este programa debemos ejeuctar las instrucciones npm install para optener las dependencias de node_modules, despues ejecutamos npm start, si no funciona, ejecutamos npm run dev

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizamso la emision en directo</title>
+    <script src="socket.io/socket.io.js"></script> <!--Cargamos el scrip de socket-->
+</head>
+<body>  
+    <!--este archivo se va encargar de visualizar el resultado de la camara(canvas)-->
+    <img id="play" src="" alt="">
+    <script>
+        var socket =io();
+        socket.on('stream', (image)=>{
+            let img = document.getElementById('play');//obtenemos el selector de imagen
+            img.src=image;//accedemos a su atributo src que recivira la imagen que es emitida por el servidor
+        })
+    </script>
+</body>
+</html>
